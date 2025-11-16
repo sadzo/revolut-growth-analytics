@@ -16,10 +16,6 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
-# Data
-data/raw/*
-data/warehouse/*
-
 # except gitkeep
 !data/raw/.gitkeep
 !data/warehouse/.gitkeep

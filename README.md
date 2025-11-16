@@ -177,3 +177,119 @@ This will later be used to build funnel dashboards.
 uv run etl/generate_fake_data.py
 ```
 ---
+
+# 🧩 Step 2 — ETL Pipeline (Python)
+
+### Purpose
+
+The ETL pipeline transforms the raw CSV files from Step 1 into clean, analytics-ready warehouse tables.  
+This mirrors how a real analytics engineering workflow at Revolut would structure raw → modeled data.
+
+ETL = Extract → Transform → Load
+
+---
+
+# ETL Flow (Short Overview)
+
+### Extract
+- Load all raw CSV files from `data/raw/`
+- Parse datetime columns for proper time calculations
+- Ensure consistent schemas for all tables
+
+### Transform
+
+The transform step prepares **three different warehouse tables**:
+
+#### 1. Transforming user-level data → `dim_users`
+- Merge all user-level raw sources (`users`, `kyc`, `cards`, `transactions`)
+- Aggregate to one row per user
+- Derive behavioral flags:
+  - `has_kyc_approved`
+  - `has_card_activated`
+  - `has_topup`
+- Compute onboarding durations in hours:
+  - signup → KYC  
+  - KYC → card_activation  
+  - card_activation → first_topup
+
+#### 2. Transforming transactions → `fct_transactions`
+- Clean transaction timestamps and enforce numeric types
+- Add helpful time dimensions:
+  - `transaction_date`
+  - `transaction_hour`
+- Keep one row per transaction for granular analysis
+
+#### 3. Transforming funnel events → `fct_funnel`
+- Sort funnel events chronologically for each user
+- Enforce correct `step_order` typing
+- Ensure there is one event per step per user
+### Load
+- Save all modeled tables to `data/warehouse/` in Parquet format
+- Parquet is chosen because it is:
+  - column-oriented (fast for analytics)
+  - compressed (efficient)
+  - used in modern data warehouses (BigQuery, Snowflake)
+  - easy to preview with the VS Code “Parquet Viewer” extension
+
+---
+
+# 🗂️ Warehouse Tables Created
+
+## 📘 1. `dim_users.parquet`
+A dimension table containing one row per user with:
+
+- country, device, marketing_channel  
+- signup timestamp  
+- KYC timestamps + final status  
+- card activation timestamp + card type  
+- first transaction timestamp  
+- behavioral flags:
+  - `has_kyc_approved`
+  - `has_card_activated`
+  - `has_topup`
+- duration metrics in hours:
+  - `time_to_kyc_hours`
+  - `time_kyc_to_card_hours`
+  - `time_card_to_first_tx_hours`
+
+Purpose: Core user-level model for onboarding, funnel conversion, and behavioral insights.
+
+---
+
+## 📘 2. `fct_transactions.parquet`
+A fact table with one row per transaction, including:
+
+- `transaction_time`
+- `transaction_date`
+- `transaction_hour`
+- `amount_eur`
+- `category`
+- `merchant_country`
+- `transaction_type`
+
+Purpose: Transaction-level analysis for revenue, spending patterns, and time-based analytics.
+
+---
+
+## 📘 3. `fct_funnel.parquet`
+A funnel event table with one row per onboarding step:
+
+- `user_id`
+- `step_order`
+- `step_name`
+- `event_time`
+
+Purpose: Conversion funnel analysis, drop-off identification, and sequencing of onboarding events.
+
+---
+
+# ▶️ Run the ETL Pipeline
+uv run etl/etl_pipeline.py
+
+This generates all warehouse tables under:
+
+They can be viewed using:
+- VS Code “Parquet Viewer”
+- or loaded via Pandas / any BI tool.
+
+
