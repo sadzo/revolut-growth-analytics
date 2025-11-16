@@ -292,4 +292,231 @@ They can be viewed using:
 - VS Code “Parquet Viewer”
 - or loaded via Pandas / any BI tool.
 
+---
+
+# 🎨 Step 3 — LookML Modeling
+
+### Purpose
+
+In this step, the warehouse tables created by the ETL pipeline are turned into a **semantic analytics layer** using LookML.  
+LookML defines how Looker interprets the tables, which fields exist, how they relate to each other, and which measures are available for analysis.
+
+LookML is not a transformation language.  
+It does not change or modify the warehouse tables.  
+Instead, it provides a clean, reusable layer of business logic that dashboards can use.
+
+---
+
+# Views (Semantic Layer for Each Table)
+
+For each warehouse table (`dim_users`, `fct_transactions`, `fct_funnel`), a LookML **view** was created.
+
+A view contains:
+
+- **dimensions** (fields you can filter or group by)
+- **dimension_groups** (for timestamps with automatic timeframes)
+- **measures** (aggregations such as counts, sums, averages, filtered counts)
+- **data types** (string, number, yesno, time)
+- **SQL definitions** describing how to reference each column
+
+This allows Looker to generate the correct SQL when building dashboards.
+
+---
+
+## 📘 1. dim_users.view.lkml
+
+This view models the user-level dimension table and includes:
+
+- user attributes: country, device, marketing_channel  
+- KYC timestamps and status  
+- card activation fields  
+- first transaction timestamp  
+- total_transactions and total_amount_eur  
+- boolean flags such as `has_kyc_approved`, `has_card_activated`, `has_topup`  
+- onboarding duration metrics in hours  
+- measures like:
+  - users_count  
+  - approved_users  
+  - card_activation_rate  
+
+This enables onboarding funnels, country/device breakdowns, and conversion metrics.
+
+---
+
+## 📘 2. fct_transactions.view.lkml
+
+This view models the transactions fact table with:
+
+- transaction timestamps (including date and hour)
+- amount_eur
+- category
+- merchant_country
+- transaction_type
+
+Measures include:
+
+- transactions_count  
+- total_amount_eur  
+- avg_transaction_amount_eur  
+- filtered counts (CARD_PAYMENT, ATM_WITHDRAWAL, TRANSFER)
+
+This enables revenue analytics, spending behaviour, and time-based insights.
+
+---
+
+## 📘 3. fct_funnel.view.lkml
+
+This view represents the funnel events for user onboarding:
+
+- step_order  
+- step_name  
+- event_time  
+
+Measures include:
+
+- steps_count  
+- distinct users per step  
+- funnel step breakdowns (e.g., viewed_signup_users)
+
+This allows building funnel dashboards and analyzing where users drop off.
+
+---
+
+# 🔗 Relationship to Warehouse
+
+Each LookML view references its warehouse table using:
+
+`sql_table_name: table_name ;;`
+
+This tells Looker which table to query.  
+LookML does not store data — it only models how to query it.
+
+---
+
+# 🧪 LookML Model File
+
+### Purpose
+
+The LookML model file defines the **entry points for analysis** in Looker.  
+While views describe *what fields exist*, the **model file** describes:
+
+- which views belong to the project  
+- which explores are available to users  
+- how the tables join together  
+- which table acts as the starting point for analysis  
+
+This step turns the individual views into a **complete semantic data model** that Looker can use to automatically generate SQL for dashboards.
+
+---
+
+# 📂 Explores (Starting Points for Analysis)
+
+Explores are the “entry tables” users see when building queries in Looker.
+
+In this project, three explores were created:
+
+### **1. `explore: dim_users` (Primary Explore)**  
+- Starting point: one row per user  
+- Joins to:
+  - `fct_transactions`
+  - `fct_funnel`
+- Used for:
+  - onboarding funnels  
+  - KYC → card → top-up analysis  
+  - segmentation by country, device, marketing_channel  
+
+### **2. `explore: fct_transactions`**  
+- Starting point: one row per transaction  
+- Joins to `dim_users`  
+- Used for:
+  - revenue analytics  
+  - spending patterns  
+  - transaction types and categories  
+
+### **3. `explore: fct_funnel`**  
+- Starting point: one row per funnel event  
+- Joins to `dim_users`  
+- Used for:
+  - analyzing where users drop off  
+  - comparing funnel performance across segments  
+
+---
+
+# 🔗 Join Logic
+
+All tables join on `user_id`:
+
+- **dim_users ←→ fct_transactions**  
+  - relationship: one user → many transactions  
+- **dim_users ←→ fct_funnel**  
+  - relationship: one user → many funnel events  
+
+---
+# Note on Looker / LookML Access
+
+The LookML layer in this project is fully defined:
+
+- warehouse tables are modeled as LookML views,
+- explores are configured for users, transactions, and funnel events,
+- joins between `dim_users`, `fct_transactions`, and `fct_funnel` are documented.
+
+In a real company setup, this LookML model would be connected to a **Looker instance**, and product/growth teams would build interactive dashboards on top of it.
+
+However, Looker (the enterprise BI tool that uses LookML) is not available as a personal or free development environment — it is typically only accessible inside companies.  
+That means I cannot run or visually test the LookML explores and dashboards myself here.
+
+Instead, I chose to:
+
+- design the LookML layer conceptually,  
+- and then **simulate the dashboards using Python**, based on the same warehouse tables.
+
+I am genuinely excited to work with a real Looker + LookML stack during the internship, where this kind of model can be connected to a live environment and turned into production dashboards.
+
+---
+# 📊 Step 4 — Dashboard Creation (Python instead of Looker)
+
+### Purpose
+
+In a real Revolut environment, mos tprobably the LookML model from Step 3 would be connected to a **Looker instance** and used to build interactive dashboards for product, growth, and operations teams.  
+Looker dashboards are typically used for:
+
+- onboarding funnel analysis  
+- growth & activation metrics  
+- transaction and revenue insights  
+- segmentation analysis (country, device, marketing channel)
+
+### Why Python instead of Looker?
+
+Looker (the enterprise BI tool that uses LookML) is not available as a public or personal development environment — it can only be accessed inside companies with a paid deployment.  
+This means I cannot connect my LookML explores to a live Looker interface here.
+
+Because of this, I decided to:
+
+- keep the full LookML modeling layer in this project (views + explores + joins),  
+- and **simulate the dashboards using Python**, based on the same warehouse tables.
+
+I already have experience building dashboards in **Power BI**, and I look forward to learning and using **Looker** directly during the internship.  
+Python dashboarding, while extremely flexible, requires more time and depth, so the Python visualizations in this project are intentionally **minimal**, illustrating only the key analytical insights.
+
+### What this step includes
+
+A small Python-based analytics overview containing:
+
+- an onboarding funnel visualization  
+- conversion metrics  
+- activation-by-country breakdown  
+- basic transaction insights (volume, categories, trends)
+
+These Python visualisations demonstrate the type of dashboards that would be built in Looker, using the same metrics and warehouse tables.
+
+All charts are generated from:
+notebooks/analytics_overview.ipynb
+
+
+This keeps the project fully reproducible without requiring access to enterprise BI tools.
+
+
+
+
+
 
