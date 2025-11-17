@@ -1,6 +1,5 @@
 # Revolut Growth Analytics
 
-
 This project is my first hands-on experience with building a full analytics engineering workflow.  
 I created it specifically as part of my application for a **Data / Analytics Engineering Internship at Revolut**.
 
@@ -14,7 +13,12 @@ My goal was to learn and demonstrate how core components of Revolut’s data sta
 Although I am new to ETL pipelines and LookML, I wanted to challenge myself next to my already experienced work in PowerBI, explore these technologies independently, and show that I can quickly learn and apply new tools.
 
 This repository documents the entire journey from raw synthetic banking data → ETL pipeline → data models → dashboards.  
-Each step is explained in a clear, notes-style format to reflect my learning process and thought structure.
+Each step is explained in a clear, notes-style format to reflect my learning process and thought structure. 
+
+> **Note:**  
+> This README is intentionally much longer than a typical production README.  
+> Since the focus of this project was to explore the full analytics engineering workflow step by step, I kept all explanations, notes, and thought processes in a single place.  
+> In a real development environment, this would be split into separate documentation files (ETL docs, data model docs, LookML docs, dashboard specs), but for this internship project I preferred to keep everything together, since it was my main documentation tool.
 
 ---
 
@@ -28,20 +32,33 @@ Here is the full structure:
 1. **Synthetic Data Generation**  
    How I created realistic Revolut-style user, KYC, card, transaction and funnel data.
 
+ -  🧬 [Go to Step 1](#step-1--synthetic-data-generation)
+
 2. **ETL Pipeline (Python)**  
    How raw CSVs are cleaned, transformed and combined into warehouse tables.
+
+- ⚙️ [Go to Step 2](#step-2--etl-pipeline-python)
 
 3. **LookML Modeling**  
    How the semantic layer is built: dimensions, measures, and explores.
 
+- 🧠 [Go to Step 3](#step-3--lookml-modeling)
+
 4. **Dashboard Creation (Python)**  
    A minimal dashboard simulating what would normally be built in Looker.
 
+-  📊 [Go to Step 4](#step-4--dashboard-creation-python-instead-of-looker)
+
 5. **(Optional) Airflow DAG**  
    A conceptual example of how the ETL pipeline could be scheduled daily in production.
+-  🌀 [Go to Step 5](#step-5--optional-airflow-dag-for-etl-orchestration)
 
 6. **Final Summary & Reflection**  
    What I learned, why I built this project, and how it connects to the internship.
+-  🎓 [Go to Step 6](#final-summary--reflection)
+   - 📘 [What I Learned](#what-i-learned)  
+   - 🎯 [Why I Built This Project](#why-i-built-this-project)  
+   - 💜 [Final Words](#final-words)
 
 To help reviewers:  
 **All executable code is inside `etl/`, `notebooks/`, and `lookml/`**  
@@ -50,7 +67,7 @@ To help reviewers:
 ---
 ---
 
-# 🧬 **Step 1 — Synthetic Data Generation**
+# **Step 1 — Synthetic Data Generation**
 
 ### **Purpose**
 To create a realistic dataset that simulates key parts of a digital banking user journey:
@@ -186,7 +203,7 @@ uv run etl/generate_fake_data.py
 ```
 ---
 
-# 🧩 Step 2 — ETL Pipeline (Python)
+# Step 2 — ETL Pipeline (Python)
 
 ### Purpose
 
@@ -302,7 +319,7 @@ They can be viewed using:
 
 ---
 
-# 🎨 Step 3 — LookML Modeling
+# Step 3 — LookML Modeling
 
 ### Purpose
 
@@ -460,7 +477,7 @@ All tables join on `user_id`:
   - relationship: one user → many funnel events  
 
 ---
-# Note on Looker / LookML Access
+### Note on Looker / LookML Access
 
 The LookML layer in this project is fully defined:
 
@@ -482,7 +499,7 @@ I am genuinely excited to work with a real Looker + LookML stack during the inte
 
 ---
 
-# 📊 Step 4 — Dashboard Creation (Python instead of Looker)
+# Step 4 — Dashboard Creation (Python instead of Looker)
 
 ### Purpose
 
@@ -534,7 +551,7 @@ All visuals are generated in: notebooks/analytics_overview.ipynb
 
 ---
 
-# 📈 Dashboard Visuals (Python)
+# Dashboard Visuals (Python)
 
 Below are the key visuals included in the dashboard.  
 Each answers a core growth/product analytics question.
@@ -611,7 +628,7 @@ Each answers a core growth/product analytics question.
 
 ---
 
-# 🌀 Step 5 — (Optional) Airflow DAG for ETL Orchestration
+# Step 5 — (Optional) Airflow DAG for ETL Orchestration
 
 ### Purpose
 
@@ -701,7 +718,7 @@ to:
 ---
 
 
-# 🏁 Final Summary & Reflection
+# Final Summary & Reflection
 
 This project brings together the essential components of a modern analytics engineering workflow — mirroring how teams at Revolut might move from raw events to insight generation.
 
@@ -746,7 +763,7 @@ Since Looker is not publicly available, this step is simulated using Python.
 
 ---
 
-# 🎓 What I Learned
+# What I Learned
 
 Working on this project taught me (on a very simple and beginner basis):
 
@@ -767,7 +784,7 @@ It also strengthened my understanding of:
 
 ---
 
-# 🚀 Why I Built This Project
+# Why I Built This Project
 
 This repository was created specifically for my application to the  
 **Data / Analytics Engineering Internship at Revolut**.
@@ -786,7 +803,7 @@ It made me even more excited about the Data / Analytics Engineering internship a
 
 ---
 
-# 💜 Final Words
+# Final Words
 
 Thank you for taking the time to review this project.
 
