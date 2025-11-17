@@ -11,35 +11,43 @@ My goal was to learn and demonstrate how core components of Revolut’s data sta
 - **funnel & growth analytics**  
 - **dashboard creation** for decision-making  
 
-Although I am new to ETL pipelines and LookML, I wanted to challenge myself, explore these technologies independently, and show that I can quickly learn and apply new tools.
+Although I am new to ETL pipelines and LookML, I wanted to challenge myself next to my already experienced work in PowerBI, explore these technologies independently, and show that I can quickly learn and apply new tools.
 
 This repository documents the entire journey from raw synthetic banking data → ETL pipeline → data models → dashboards.  
 Each step is explained in a clear, notes-style format to reflect my learning process and thought structure.
 
 ---
 
-# 📌 **Project Steps (Overview)**
+# 📋 How This README Is Structured
 
-The project follows a real-world analytics engineering workflow:
+To make this project easy to understand and follow, the README is organized into clear, sequential steps.  
+Each step mirrors one part of a real analytics engineering workflow at Revolut.
+
+Here is the full structure:
 
 1. **Synthetic Data Generation**  
-   Create realistic Revolut-style banking data (users, KYC, card activation, transactions, funnel steps).
+   How I created realistic Revolut-style user, KYC, card, transaction and funnel data.
 
 2. **ETL Pipeline (Python)**  
-   Clean, transform, and enrich the raw data.  
-   Produce warehouse-ready tables in Parquet format.
+   How raw CSVs are cleaned, transformed and combined into warehouse tables.
 
-3. **Data Modeling (LookML)**  
-   Define dimensions, measures, views, and explores for analytics use cases.
+3. **LookML Modeling**  
+   How the semantic layer is built: dimensions, measures, and explores.
 
-4. **Dashboards (Looker)**  
-   Build funnel dashboards, growth dashboards, and revenue/transaction insights.
+4. **Dashboard Creation (Python)**  
+   A minimal dashboard simulating what would normally be built in Looker.
 
 5. **(Optional) Airflow DAG**  
-   Wrap the ETL pipeline in a scheduled workflow.
+   A conceptual example of how the ETL pipeline could be scheduled daily in production.
 
-Each step has its own documentation section below.
+6. **Final Summary & Reflection**  
+   What I learned, why I built this project, and how it connects to the internship.
 
+To help reviewers:  
+**All executable code is inside `etl/`, `notebooks/`, and `lookml/`**  
+**All images for the dashboard are located in `images/`**  
+
+---
 ---
 
 # 🧬 **Step 1 — Synthetic Data Generation**
@@ -53,7 +61,7 @@ To create a realistic dataset that simulates key parts of a digital banking user
 - Realistic spending patterns  
 - Funnel step tracking
 
-This ensures we can later perform product analytics and build dashboards without relying on sensitive real banking data.
+This ensures to later be able to perform product analytics and build dashboards without relying on sensitive real banking data.
 
 ### **Output Files**
 Generated and saved to: data/raw/
@@ -473,47 +481,329 @@ Instead, I chose to:
 I am genuinely excited to work with a real Looker + LookML stack during the internship, where this kind of model can be connected to a live environment and turned into production dashboards.
 
 ---
+
 # 📊 Step 4 — Dashboard Creation (Python instead of Looker)
 
 ### Purpose
 
-In a real Revolut environment, mos tprobably the LookML model from Step 3 would be connected to a **Looker instance** and used to build interactive dashboards for product, growth, and operations teams.  
-Looker dashboards are typically used for:
+In a real Revolut environment, the LookML model from Step 3 would be connected to a **Looker instance**.  
+Looker dashboards are normally used for:
 
-- onboarding funnel analysis  
-- growth & activation metrics  
-- transaction and revenue insights  
-- segmentation analysis (country, device, marketing channel)
+- onboarding funnels  
+- KYC and card activation metrics  
+- conversion and growth analytics  
+- transaction behaviour  
+- segmentation by country, device, and marketing channel  
+- cohort and retention analysis  
 
-### Why Python instead of Looker?
+Since Looker is **not available publicly**, the dashboarding step of this project is implemented using **Python**, based on the warehouse tables from Step 2.
 
-Looker (the enterprise BI tool that uses LookML) is not available as a public or personal development environment — it can only be accessed inside companies with a paid deployment.  
-This means I cannot connect my LookML explores to a live Looker interface here.
+> **Note:**  
+> The notebook (`notebooks/analytics_overview.ipynb`) contains additional comments for each chart, including **proposals for how to make each visual more advanced**, segmentation ideas, and scaling opportunities.
 
-Because of this, I decided to:
+---
 
-- keep the full LookML modeling layer in this project (views + explores + joins),  
-- and **simulate the dashboards using Python**, based on the same warehouse tables.
+## Why Python instead of Looker?
 
-I already have experience building dashboards in **Power BI**, and I look forward to learning and using **Looker** directly during the internship.  
-Python dashboarding, while extremely flexible, requires more time and depth, so the Python visualizations in this project are intentionally **minimal**, illustrating only the key analytical insights.
+Looker is a paid enterprise BI application and cannot be accessed locally or for personal projects.  
+Because of this:
 
-### What this step includes
+- I cannot render the LookML explores inside Looker but.. 
+- ✔️ I *can* still build the LookML modeling layer (Step 3)  
+- ✔️ I can replicate the dashboards using Python + Matplotlib  
 
-A small Python-based analytics overview containing:
+I also already have dashboarding experience in **Power BI**, and I’m excited to extend this skillset to Looker during the internship.
 
-- an onboarding funnel visualization  
-- conversion metrics  
-- activation-by-country breakdown  
-- basic transaction insights (volume, categories, trends)
+The Python example dashboard is intentionally **minimal** — the goal is to illustrate analytical thinking and how to extract product insights from the warehouse tables.
 
-These Python visualisations demonstrate the type of dashboards that would be built in Looker, using the same metrics and warehouse tables.
+---
 
-All charts are generated from:
-notebooks/analytics_overview.ipynb
+## What this step includes
+
+A small Python-based analytics dashboard showing:
+
+- the event-level funnel  
+- the user-level funnel  
+- time-to-complete for each onboarding step  
+- activation metrics (by country & device)  
+- transaction behaviour  
+- category distributions and spending patterns  
+- monthly active users (MAU)
+
+All visuals are generated in: notebooks/analytics_overview.ipynb
+
+---
+
+# 📈 Dashboard Visuals (Python)
+
+Below are the key visuals included in the dashboard.  
+Each answers a core growth/product analytics question.
+
+---
+
+## **1️⃣ Event-Level Onboarding Funnel**  
+**Question answered:** Where do users drop off during onboarding?
+
+![funnel_event_level](images/01_funnel_event_level.png)
+
+---
+
+## **2️⃣ Average Time Between Funnel Steps**  
+**Question answered:** How long does each onboarding step take on average?
+
+![funnel_step_durations](images/02_funnel_step_durations_lollipop.png)
+
+---
+
+## **3️⃣ Daily Funnel Trend**  
+**Question answered:** Are onboarding step volumes stable over time?
+
+![funnel_daily_trend](images/03_funnel_daily_trend.png)
+
+---
+
+## **4️⃣ User-Level Funnel Summary**  
+**Question answered:** What percentage of users complete the full onboarding flow?
+
+![funnel_dim_users](images/04_funnel_dim_users.png)
+
+---
+
+## **5️⃣ Card Activation Rate by Country**  
+**Question answered:** Which markets convert the best?
+
+![activation_country](images/05_activation_rate_country.png)
+
+---
+
+## **6️⃣ Card Activation Rate by Device**  
+**Question answered:** Which platform has the strongest conversion rate?
+
+![activation_device](images/06_activation_rate_device.png)
+
+---
+
+## **7️⃣ Distribution of Time to KYC Approval**  
+**Question answered:** How long does KYC usually take?
+
+![kyc_duration_hist](images/07_kyc_duration_distribution.png)
+
+---
+
+## **8️⃣ Transaction Type Distribution**  
+**Question answered:** What do users most commonly do with their card?
+
+![txn_type_pie](images/08_transaction_type_pie.png)
+
+---
+
+## **9️⃣ Transaction Amounts by Category**  
+**Question answered:** Which categories show high or low spending amounts?
+
+![txn_boxplot](images/09_amount_boxplot_by_category.png)
+
+---
+
+## **🔟 Monthly Active Users**  
+**Question answered:** How many users perform at least one transaction per month?
+
+![mau_area](images/10_mau_area.png)
+
+---
+
+# 🌀 Step 5 — (Optional) Airflow DAG for ETL Orchestration
+
+### Purpose
+
+So far, this project already covers:
+
+- ETL and warehouse tables (Python)
+- a semantic layer (LookML)
+- analytical visuals (Python dashboard)
+
+In a real data/analytics engineering setup, there is usually one more piece:
+
+> **Orchestration** — a tool that decides *when* and *in which order* jobs run.
+
+I assume at Revolut, or similar companies, this role is often covered by **Apache Airflow**.
+
+To reflect that, I added a small, conceptual **Airflow DAG** that shows how the ETL pipeline in this project could be scheduled in production.
+
+---
+
+## 🌀 Understanding the Airflow DAG (Simple Explanation)
+
+File: dags/revolut_etl_dag.py
+
+This Airflow DAG defines one daily workflow called `revolut_growth_etl_daily`.
+
+It performs two conceptual steps:
+
+1. **(Optional) Generate synthetic banking data**  
+   → calls: `etl/generate_fake_data.py`
+
+2. **Run the ETL pipeline to refresh the warehouse tables**  
+   → calls: `etl/etl_pipeline.py` (`run_etl()` function)
+
+The DAG is scheduled as a daily job:
+
+- runs every day at **06:00**
+- execution order: `generate_fake_banking_data` → `run_etl_pipeline`
+- uses `PythonOperator` to directly call Python functions from this repository
+
+This is exactly how orchestration works in modern analytics engineering environments.
+
+---
+
+## Why this DAG is included
+
+This DAG serves as:
+
+- a **learning exercise** (my first practical exposure to Airflow-style orchestration)  
+- an **architecture signal** showing I understand how ETL → warehouse → scheduling interact  
+
+It is **not required** to run this project.  
+The repository works fully even without Airflow installed.
+
+However, this DAG demonstrates how the existing ETL pipeline can move from:
+
+> run this script manually on my laptop
+
+to:
+
+> automatically run this pipeline every morning in a production environment
+
+---
+
+## 🔄 How ETL, LookML, Dashboards & Airflow Work Together  
+(Super simple, high-level view)
+
+- **ETL (Python)**  
+  Raw CSV → clean → transform → output warehouse tables  
+
+- **Warehouse tables**  
+  `dim_users`, `fct_funnel`, `fct_transactions`  
+  → these are the single source of truth
+
+- **LookML (views + model)**  
+  Defines *how* these warehouse tables are queried  
+  (dimensions, measures, joins, explores)
+
+- **Dashboards (Python here, Looker in reality)**  
+  Uses the LookML logic to answer business questions  
+  (funnels, activation, transactions, growth metrics)
+
+- **Airflow (this step)**  
+  Schedules and orchestrates *when* ETL runs  
+  → keeps dashboards and models always fresh and up-to-date
+
+---
+---
 
 
-This keeps the project fully reproducible without requiring access to enterprise BI tools.
+# 🏁 Final Summary & Reflection
+
+This project brings together the essential components of a modern analytics engineering workflow — mirroring how teams at Revolut might move from raw events to insight generation.
+
+Below is a simple overview of how each step connects to the next:
+
+## 🔄 How Everything Fits Together (A more detailed Overview)
+
+### **1. Raw Data → ETL Pipeline**
+Raw CSV files are extracted, cleaned, and transformed using Python.  
+The goal is to turn messy, event-level information into **analysis-ready warehouse tables**.
+
+**Output:**  
+`dim_users.parquet`, `fct_funnel.parquet`, `fct_transactions.parquet`
+
+---
+
+### **2. Warehouse Tables → LookML Views**
+Each warehouse table is described in LookML (dimensions, measures, timegroups).  
+LookML does *not* change the data — it just defines **how analysts can query it**.
+
+**Output:**  
+`dim_users.view.lkml`, `fct_funnel.view.lkml`, `fct_transactions.view.lkml`
+
+---
+
+### **3. LookML Views → LookML Model (Explores + Joins)**
+The model file connects the views together using keys like `user_id`.  
+This creates an **Explore**, which is Looker’s place for building dashboards.
+
+**Output:**  
+`revolut_growth.model.lkml`
+
+---
+
+### **4. Explores → Dashboards**
+In a real Revolut environment, dashboards would now be built directly in Looker.  
+Since Looker is not publicly available, this step is simulated using Python.
+
+**Output:**  
+`notebooks/analytics_overview.ipynb` + full Python visual pack  
+(images saved to `images/`)
+
+---
+
+# 🎓 What I Learned
+
+Working on this project taught me (on a very simple and beginner basis):
+
+- how to design and structure an ETL pipeline from scratch  
+- how to create warehouse-style tables that are easy to analyze  
+- how to build a semantic model using LookML  
+- how dimensions, measures, and explores work together  
+- how product funnels and financial analytics are built in practice  
+- how to use Python to produce analytics dashboards similar to Looker  
+
+It also strengthened my understanding of:
+
+- onboarding funnels  
+- activation metrics  
+- transaction behaviour  
+- country/device segmentation  
+- performance measurement and growth analytics  
+
+---
+
+# 🚀 Why I Built This Project
+
+This repository was created specifically for my application to the  
+**Data / Analytics Engineering Internship at Revolut**.
+
+I wanted to:
+
+- show that I can learn new tools quickly (ETL, LookML, warehouse modeling)  
+- demonstrate real analytical thinking with product and growth data  
+- build something close to Revolut’s real analytics stack  
+- prove my curiosity, ownership, and ability to independently execute a full mini-project  
+
+This project was my first time working with ETL pipelines and LookML but also thinking about orchestration and end-to-end data workflow —  
+and I genuinely enjoyed every part of the process and the things got very clear very quickly.
+
+It made me even more excited about the Data / Analytics Engineering internship at Revolut, where these components come together in a real, high-impact production environment.
+
+---
+
+# 💜 Final Words
+
+Thank you for taking the time to review this project.
+
+I would be excited to continue working with these tools — especially LookML and deeper warehouse modeling — inside Revolut's environment.
+
+I’m highly motivated to:
+
+- learn from experienced Analytics Engineers  
+- contribute to growth and onboarding insights  
+- work across product, operations, and data teams  
+- bring strong ownership, speed, and problem-solving  
+- and develop real impact for millions of users
+
+I can’t wait to bring this energy, curiosity, and willingness to learn into the internship.
+
+
+
 
 
 
